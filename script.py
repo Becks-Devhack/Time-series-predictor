@@ -6,9 +6,6 @@ import json
 stress_classifier = tf.keras.models.load_model('stress_classifier')
 app = Flask(__name__)
 
-movies = {}
-max_id = 1
-
 @app.route("/stress_level", methods=["GET"])
 def get_stress_level():
     global stress_classifier
@@ -18,19 +15,22 @@ def get_stress_level():
         # Error handling
         return Response(status=400)
     br = payload['breathing_rate']
-    bt = payload['body_temp']
     os = payload.get('oxygen_sat', 90)
+    if os == "":
+        os = 90
     sh = payload['sleep_hrs']
     hr = payload['heart_rate']
     
-    data = pd.DataFrame([[0, br,bt,os,sh, hr]], columns=['', 'breathing_rate', 'body_temp', 'oxygen_sat', 'sleep_hrs', 'heart_rate'])
-    stress_level = stress_classifier.predict(data).argmax().tolist()
+    data = pd.DataFrame([[br, os, sh, hr]], columns=['breathing_rate', 'oxygen_sat', 'sleep_hrs', 'heart_rate'])
+    classification = stress_classifier.predict(data)
+    print(classification)
+    stress_level = classification.argmax().tolist()
     return jsonify({'stress level':stress_level}), 200
 
 @app.route("/vacantion_prediction", methods=["GET"])
 def get_vacantion_prediction():
     global stress_classifier
-    return jsonify([{'id':k, 'nume':v} for k,v in movies.items()]), 200
+    return jsonify({'prediction':False}), 200
 
 # @app.route('/movies', methods=["POST"])
 # def add_movie():
