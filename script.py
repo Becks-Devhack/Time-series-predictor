@@ -14,6 +14,7 @@ def get_stress_level():
     if not payload:
         # Error handling
         return Response(status=400)
+    
     br = payload['breathing_rate']
     os = payload.get('oxygen_sat', 90)
     if os == "":
@@ -31,18 +32,6 @@ def get_stress_level():
 def get_vacantion_prediction():
     global stress_classifier
     return jsonify({'prediction':False}), 200
-
-# @app.route('/movies', methods=["POST"])
-# def add_movie():
-#     global movies
-#     global max_id
-#     payload = request.get_json(silent=True)
-#     if not payload:
-#         # Error handling
-#         return Response(status=400)
-#     movies[max_id] = payload['nume']
-#     max_id += 1
-#     return Response(status=201)
 
 if __name__ == '__main__':
     print(stress_classifier.summary())
