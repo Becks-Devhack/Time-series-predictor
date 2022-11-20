@@ -45,7 +45,7 @@ def get_vacantion_prediction():
     y_pred_df["Predictions"] = SARIMAXmodel.predict(start = y_pred_df.index[0], end = y_pred_df.index[-1])
     
     vacantion = False
-    if y_pred_df["Predictions"].values[-1] - y_pred_df["Predictions"].values[0] > 0.35:
+    if y_pred_df["Predictions"].values[0] - y_pred_df["Predictions"].values[-1] > 0.35:
         vacantion = True
     
     return jsonify({'prediction':vacantion}), 200
