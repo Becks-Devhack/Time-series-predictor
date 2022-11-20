@@ -1,7 +1,6 @@
 import tensorflow as tf
 from flask import request, jsonify, Response, Flask
 import pandas as pd 
-import json
 
 stress_classifier = tf.keras.models.load_model('models/stress_classifier')
 app = Flask(__name__)
@@ -35,4 +34,4 @@ def get_vacantion_prediction():
 
 if __name__ == '__main__':
     print(stress_classifier.summary())
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=80, debug=True)
