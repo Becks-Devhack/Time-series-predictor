@@ -3,7 +3,7 @@ from flask import request, jsonify, Response, Flask
 import pandas as pd 
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
-stress_classifier = tf.keras.models.load_model('src/models/stress_classifier')
+stress_classifier = tf.keras.models.load_model('models/stress_classifier')
 app = Flask(__name__)
 
 @app.route("/data", methods=["GET"])
