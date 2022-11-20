@@ -3,10 +3,10 @@ from flask import request, jsonify, Response, Flask
 import pandas as pd 
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
-stress_classifier = tf.keras.models.load_model('models/stress_classifier')
+stress_classifier = tf.keras.models.load_model('src/models/stress_classifier')
 app = Flask(__name__)
 
-@app.route("/stress_level", methods=["GET"])
+@app.route("/data", methods=["GET"])
 def get_stress_level():
     global stress_classifier
     payload = request.get_json(silent=True)
@@ -15,16 +15,21 @@ def get_stress_level():
         return Response(status=400)
     
     br = payload['breathing_rate']
-    os = payload.get('oxygen_sat', 90)
-    if os == "":
-        os = 90
+    os = []
     sh = payload['sleep_hrs']
     hr = payload['heart_rate']
     
-    data = pd.DataFrame([[br, os, sh, hr]], columns=['breathing_rate', 'oxygen_sat', 'sleep_hrs', 'heart_rate'])
+    max_l = max([len(br), len(sh), len(hr)])
+    br = [br[i] if i < len(br) else 25 for i in range(max_l)]
+    os = [os[i] if i < len(os) else 95 for i in range(max_l)]
+    sh = [sh[i] if i < len(sh) else 6 for i in range(max_l)]
+    hr = [hr[i] if i < len(hr) else 75 for i in range(max_l)]
+    
+    data = pd.DataFrame({'breathing_rate':br, 'oxygen_sat':os, 'sleep_hrs':sh, 'heart_rate':hr})
+    print(data.shape)
     classification = stress_classifier.predict(data)
-    print(classification)
-    stress_level = classification.argmax().tolist()
+    print(classification.tolist())
+    stress_level = [max(range(len(x)), key=x.__getitem__) for x in classification.tolist()]
     return jsonify({'stress level':stress_level}), 200
 
 @app.route("/vacantion_prediction", methods=["GET"])
